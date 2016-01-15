@@ -26,7 +26,7 @@ gobgp-node is tested on Debian Linux and OSX.
 npm install https://github.com/codeout/gobgp-node
 ```
 
-This installation process builds C-shared library from already installed gobgp in your system, and links gobgp-node binary with it.
+This installation process builds the C-shared library from already installed gobgp in your system and links gobgp-node binary with it.
 
 ## Usage
 
