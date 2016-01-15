@@ -24,29 +24,32 @@
     }
 
     Gobgp.prototype.getRib = function(options, callback) {
-      return this.stub.getRib(options, function(err, table) {
-        if (err) {
-          return console.error(err);
-        }
-        table.destinations.forEach(function(destination) {
-          return destination.paths = destination.paths.map(function(path) {
-            var decoded;
-            decoded = JSON.parse(libgobgp.decode_path(path));
-            path.nlri = decoded.nlri.value;
-            path.attrs = decoded.attrs;
-            delete path.pattrs;
-            return path;
+      return this.stub.getRib(options, (function(_this) {
+        return function(err, table) {
+          if (err) {
+            return console.error(err);
+          }
+          table.destinations.forEach(function(destination) {
+            return destination.paths = destination.paths.map(function(path) {
+              var decoded;
+              decoded = JSON.parse(_this.decodePath(path));
+              path.nlri = decoded.nlri.value;
+              path.attrs = decoded.attrs;
+              delete path.pattrs;
+              return path;
+            });
           });
-        });
-        if (callback) {
-          return callback(table);
-        }
-      });
+          if (callback) {
+            return callback(table);
+          }
+        };
+      })(this));
     };
 
-    Gobgp.prototype.modPath = function(family, string, callback) {
-      var path;
-      path = libgobgp.serialize_path(family, string);
+    Gobgp.prototype.modPath = function(family, path, callback) {
+      if (typeof path === 'string') {
+        path = this.serializePath(family, path);
+      }
       return this.stub.modPath({
         path: path
       }, function(err, response) {
@@ -57,6 +60,14 @@
           return callback(response);
         }
       });
+    };
+
+    Gobgp.prototype.serializePath = function(family, string) {
+      return libgobgp.serialize_path(family, string);
+    };
+
+    Gobgp.prototype.decodePath = function(path) {
+      return libgobgp.decode_path(path);
     };
 
     return Gobgp;

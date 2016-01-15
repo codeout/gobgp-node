@@ -13,12 +13,12 @@ class Gobgp
     @stub = new protoDescriptor.GobgpApi(server, grpc.Credentials.createInsecure())
 
   getRib: (options, callback)->
-    @stub.getRib options, (err, table)->
+    @stub.getRib options, (err, table)=>
       return console.error(err) if err
 
-      table.destinations.forEach (destination)->
-        destination.paths = destination.paths.map (path)->
-          decoded = JSON.parse(libgobgp.decode_path(path))
+      table.destinations.forEach (destination)=>
+        destination.paths = destination.paths.map (path)=>
+          decoded = JSON.parse(@decodePath(path))
           path.nlri = decoded.nlri.value
           path.attrs = decoded.attrs
           delete path.pattrs
@@ -26,12 +26,19 @@ class Gobgp
 
       callback table if callback
 
-  modPath: (family, string, callback)->
-    path = libgobgp.serialize_path(family, string)
+  modPath: (family, path, callback)->
+    if typeof(path) == 'string'
+      path = @serializePath(family, path)
 
     @stub.modPath {path: path}, (err, response)->
       return console.error(err) if err
       callback response if callback
+
+  serializePath: (family, string)->
+    libgobgp.serialize_path(family, string)
+
+  decodePath: (path)->
+    libgobgp.decode_path(path)
 
 
 module.exports = Gobgp
