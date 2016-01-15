@@ -6,17 +6,24 @@
       'dependencies': [
         'deps/gobgp.gyp:gobgp-c'
       ],
+      'include_dirs': [
+        '<(module_root_dir)/deps/gobgp'
+      ],
       'conditions': [
         ['OS=="mac"', {
-          'include_dirs': [
-            '<(module_root_dir)/deps/gobgp'
-          ],
           'xcode_settings': {
             'OTHER_LDFLAGS': [
               '-Wl,-rpath,<(module_root_dir)/deps/gobgp',
               '-L<(module_root_dir)/deps/gobgp'
             ]
           },
+          'libraries': [ '-lgobgp' ]
+        }],
+        ['OS=="linux"', {
+          'ldflags': [
+            '-Wl,-rpath,<(module_root_dir)/deps/gobgp',
+            '-L<(module_root_dir)/deps/gobgp'
+          ],
           'libraries': [ '-lgobgp' ]
         }]
       ]

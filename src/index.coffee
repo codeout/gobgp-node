@@ -1,5 +1,5 @@
 grpc = require('grpc')
-protoDescriptor = grpc.load("#{__dirname}/deps/gobgp/api/gobgp.proto").gobgpapi
+protoDescriptor = grpc.load("#{__dirname}/deps/gobgp/gobgp.proto").gobgpapi
 libgobgp = require('./build/Release/gobgp')
 
 class Gobgp

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <node.h>
 #include <node_buffer.h>
 #include "libgobgp.h"
