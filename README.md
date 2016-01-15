@@ -1,6 +1,5 @@
 # gobgp-node
 
-[![Build Status](https://travis-ci.org/codeout/gobgp-node.svg)](https://travis-ci.org/codeout/gobgp-node)
 [![Code Climate](https://codeclimate.com/github/codeout/gobgp-node.png)](https://codeclimate.com/github/codeout/gobgp-node)
 
 gobgp library - NodeJS client for gobgpd
