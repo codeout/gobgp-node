@@ -4,6 +4,12 @@
 
 gobgp library - NodeJS client for gobgpd
 
+This is a young project which allows you to manage gobgpd remotely.
+
+* Features
+  * RIB management which is equivalent to ```gobgp global rib``` in gobgp CLI
+
+
 ## Requirements
 
 gobgp-node is tested on Debian Linux and OSX.
