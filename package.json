@@ -1,0 +1,27 @@
+{
+  "name": "gobgp",
+  "description": "gobgp library - NodeJS client for gobgpd",
+  "version": "0.1.0",
+  "author": "Shintaro Kojima <goodies@codeout.net>",
+  "license": "MIT",
+  "keywords": [
+    "gobgp",
+    "client",
+    "bgp",
+    "flowspec"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/codeout/gobgp-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/codeout/gobgp-node/issues"
+  },
+  "dependencies": {
+    "grpc": "^0.11.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "coffee -o . -c src/index.coffee"
+  }
+}
