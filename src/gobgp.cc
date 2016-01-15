@@ -11,6 +11,24 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
+void GetRouteFamily(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  if (args.Length() < 1) {
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Wrong number of arguments")));
+    return;
+  }
+
+  if (!args[0]->IsString()) {
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument: Must be a String")));
+    return;
+  }
+
+  int family = get_route_family(*String::Utf8Value(args[0]));
+
+  args.GetReturnValue().Set(family);
+}
+
 void DecodePath(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
@@ -87,6 +105,7 @@ void SerializePath(const FunctionCallbackInfo<Value>& args) {
 }
 
 void init(Local<Object> exports) {
+  NODE_SET_METHOD(exports, "get_route_family", GetRouteFamily);
   NODE_SET_METHOD(exports, "decode_path", DecodePath);
   NODE_SET_METHOD(exports, "serialize_path", SerializePath);
 }

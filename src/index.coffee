@@ -3,16 +3,13 @@ protoDescriptor = grpc.load("#{__dirname}/deps/gobgp/api/gobgp.proto").gobgpapi
 libgobgp = require('./build/Release/gobgp')
 
 class Gobgp
-  @AFI_IP:  1
-  @AFI_IP6: 2
-  @SAFI_FLOW_SPEC_UNICAST: 133
-  @RF_FS_IPv4_UC: @AFI_IP<<16 | @SAFI_FLOW_SPEC_UNICAST
-  @RF_FS_IPv6_UC: @AFI_IP6<<16 | @SAFI_FLOW_SPEC_UNICAST
-
   constructor: (server)->
     @stub = new protoDescriptor.GobgpApi(server, grpc.Credentials.createInsecure())
 
   getRib: (options, callback)->
+    if typeof(options.family) == 'string'
+      options.family = @routeFamily(options.family)
+
     @stub.getRib options, (err, table)=>
       return console.error(err) if err
 
@@ -34,7 +31,12 @@ class Gobgp
       return console.error(err) if err
       callback response if callback
 
+  routeFamily: (string)->
+    libgobgp.get_route_family(string)
+
   serializePath: (family, string)->
+    if typeof(family) == 'string'
+      family = @routeFamily(family)
     libgobgp.serialize_path(family, string)
 
   decodePath: (path)->

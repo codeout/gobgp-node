@@ -9,21 +9,14 @@
   libgobgp = require('./build/Release/gobgp');
 
   Gobgp = (function() {
-    Gobgp.AFI_IP = 1;
-
-    Gobgp.AFI_IP6 = 2;
-
-    Gobgp.SAFI_FLOW_SPEC_UNICAST = 133;
-
-    Gobgp.RF_FS_IPv4_UC = Gobgp.AFI_IP << 16 | Gobgp.SAFI_FLOW_SPEC_UNICAST;
-
-    Gobgp.RF_FS_IPv6_UC = Gobgp.AFI_IP6 << 16 | Gobgp.SAFI_FLOW_SPEC_UNICAST;
-
     function Gobgp(server) {
       this.stub = new protoDescriptor.GobgpApi(server, grpc.Credentials.createInsecure());
     }
 
     Gobgp.prototype.getRib = function(options, callback) {
+      if (typeof options.family === 'string') {
+        options.family = this.routeFamily(options.family);
+      }
       return this.stub.getRib(options, (function(_this) {
         return function(err, table) {
           if (err) {
@@ -62,7 +55,14 @@
       });
     };
 
+    Gobgp.prototype.routeFamily = function(string) {
+      return libgobgp.get_route_family(string);
+    };
+
     Gobgp.prototype.serializePath = function(family, string) {
+      if (typeof family === 'string') {
+        family = this.routeFamily(family);
+      }
       return libgobgp.serialize_path(family, string);
     };
 
