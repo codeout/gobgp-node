@@ -20,7 +20,7 @@ void DecodePath(const FunctionCallbackInfo<Value>& args) {
   }
 
   if (!args[0]->IsObject()) {
-    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument")));
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument: Must be an Object")));
     return;
   }
   Local<Object> path_arg = args[0]->ToObject();
@@ -28,7 +28,7 @@ void DecodePath(const FunctionCallbackInfo<Value>& args) {
   Local<Value> pattrs_val = path_arg->Get(String::NewFromUtf8(isolate, "pattrs"));
 
   if (!pattrs_val->IsArray()) {
-    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument")));
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument: Value of \"pattrs\" must be an Array")));
     return;
   }
   Local<Array> pattrs_arg = Local<Array>::Cast(pattrs_val);
@@ -64,11 +64,11 @@ void SerializePath(const FunctionCallbackInfo<Value>& args) {
   }
 
   if (!args[0]->IsNumber()) {
-    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument")));
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument: Must be a Number")));
     return;
   }
   if (!args[1]->IsString()) {
-    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument")));
+    isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "Invalid argument: Must be a String")));
     return;
   }
 
