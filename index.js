@@ -39,9 +39,10 @@
       })(this));
     };
 
-    Gobgp.prototype.modPath = function(family, path, callback) {
+    Gobgp.prototype.modPath = function(options, path, callback) {
       if (typeof path === 'string') {
-        path = this.serializePath(family, path);
+        path = this.serializePath(options.family, path);
+        path.is_withdraw = options.withdraw;
       }
       if (!path) {
         return callback("Invalid argument: path");

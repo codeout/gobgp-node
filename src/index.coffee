@@ -25,9 +25,10 @@ class Gobgp
       callback(null, table) if callback
 
 
-  modPath: (family, path, callback)->
+  modPath: (options, path, callback)->
     if typeof(path) == 'string'
-      path = @serializePath(family, path)
+      path = @serializePath(options.family, path)
+      path.is_withdraw = options.withdraw
     return callback("Invalid argument: path") unless path
 
     @stub.modPath {path: path}, (err, response)->

@@ -36,7 +36,16 @@ Originate a route with gobgpd:
 var Gobgp = require('gobgp');
 var gobgp = new Gobgp('<gobgpd address>:50051');
 
-gobgp.modPath('ipv4-unicast', '10.0.0.0/24');
+gobgp.modPath(family: 'ipv4-unicast', '10.0.0.0/24');
+```
+
+Withdraw a route from gobgpd:
+
+```js
+var Gobgp = require('gobgp');
+var gobgp = new Gobgp('<gobgpd address>:50051');
+
+gobgp.modPath(family: 'ipv4-unicast', withdraw: true, '10.0.0.0/24');
 ```
 
 Show routes in gobgpd:
@@ -56,7 +65,7 @@ Originate a flowspec route with gobgpd:
 var Gobgp = require('gobgp');
 var gobgp = new Gobgp('<gobgpd address>:50051');
 
-gobgp.modPath('ipv4-flowspec', 'match source 10.0.0.0/24 then rate-limit 10000');
+gobgp.modPath(family: 'ipv4-flowspec', 'match source 10.0.0.0/24 then rate-limit 10000');
 ```
 
 Show flowspec routes in gobgpd:
@@ -83,7 +92,7 @@ path.pattrs.push(new Buffer([
   0x04,                      // Length
   0xff, 0xff, 0xff, 0x02]))  // NO_ADVERTISE
 
-gobgp.modPath('ipv4-unicast', path);
+gobgp.modPath(family: 'ipv4-unicast', path);
 ```
 
 ## Copyright and License
