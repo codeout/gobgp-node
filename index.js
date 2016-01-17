@@ -40,12 +40,15 @@
     };
 
     Gobgp.prototype.modPath = function(options, path, callback) {
-      if (typeof path === 'string') {
-        path = this.serializePath(options.family, path);
-        path.is_withdraw = options.withdraw;
-      }
       if (!path) {
         return callback("Invalid argument: path");
+      }
+      if (typeof path === 'string') {
+        path = this.serializePath(options.family, path);
+        if (!path) {
+          return callback("Invalid argument: path");
+        }
+        path.is_withdraw = options.withdraw;
       }
       return this.stub.modPath({
         path: path
