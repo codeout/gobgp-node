@@ -92,6 +92,8 @@ void SerializePath(const FunctionCallbackInfo<Value>& args) {
   }
 
   path* serialized = serialize_path(args[0]->NumberValue(), *String::Utf8Value(args[1]));
+  if (!serialized)
+    return;
 
   Local<Object> path = Object::New(isolate);
   path->Set(String::NewFromUtf8(isolate, "nlri"), node::Buffer::New(isolate, serialized->nlri.value, serialized->nlri.len).ToLocalChecked());
