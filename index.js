@@ -20,7 +20,7 @@
       return this.stub.getRib(options, (function(_this) {
         return function(err, table) {
           if (err) {
-            return console.error(err);
+            return callback(err);
           }
           table.destinations.forEach(function(destination) {
             return destination.paths = destination.paths.map(function(path) {
@@ -33,7 +33,7 @@
             });
           });
           if (callback) {
-            return callback(table);
+            return callback(null, table);
           }
         };
       })(this));
@@ -43,14 +43,17 @@
       if (typeof path === 'string') {
         path = this.serializePath(family, path);
       }
+      if (!path) {
+        return callback("Invalid argument: path");
+      }
       return this.stub.modPath({
         path: path
       }, function(err, response) {
         if (err) {
-          return console.error(err);
+          return callback(err);
         }
         if (callback) {
-          return callback(response);
+          return callback(null, response);
         }
       });
     };
