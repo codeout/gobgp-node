@@ -23,7 +23,7 @@ gobgp-node is tested on Debian Linux and OSX.
 ## Installation
 
 ```zsh
-npm install https://github.com/codeout/gobgp-node
+npm install gobgp
 ```
 
 This installation process builds the C-shared library from already installed gobgp in your system and links gobgp-node binary with it.
