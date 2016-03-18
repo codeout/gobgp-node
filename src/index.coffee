@@ -4,7 +4,7 @@ libgobgp = require('./build/Release/gobgp')
 
 class Gobgp
   constructor: (server)->
-    @stub = new protoDescriptor.GobgpApi(server, grpc.Credentials.createInsecure())
+    @stub = new protoDescriptor.GobgpApi(server, grpc.credentials.createInsecure())
 
 
   getRib: (options, callback)->

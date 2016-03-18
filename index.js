@@ -10,7 +10,7 @@
 
   Gobgp = (function() {
     function Gobgp(server) {
-      this.stub = new protoDescriptor.GobgpApi(server, grpc.Credentials.createInsecure());
+      this.stub = new protoDescriptor.GobgpApi(server, grpc.credentials.createInsecure());
     }
 
     Gobgp.prototype.getRib = function(options, callback) {
