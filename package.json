@@ -21,10 +21,14 @@
     "grpc": "^0.13.0"
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0"
+    "chai": "^3.5.0",
+    "coffee-script": "^1.10.0",
+    "mocha": "^2.4.5"
   },
   "main": "index.js",
   "scripts": {
-    "build": "coffee -o . -c src/index.coffee"
+    "build":   "coffee -o . -c src/index.coffee",
+    "rebuild": "node-gyp rebuild && coffee -o . -c src/index.coffee",
+    "test":    "mocha --compilers coffee:coffee-script/register"
   }
 }
