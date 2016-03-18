@@ -84,7 +84,7 @@ Originate a BGP community added route:
 ```js
 var Gobgp = require('gobgp');
 var gobgp = new Gobgp('<gobgpd address>:50051');
-var path = gobgp.serializePath('ipv4-unicast', '10.0.0.0/24');
+var path = gobgp.serializePath('ipv4-unicast', '10.0.0.0/24 community no-advertise');
 
 path.pattrs.push(new Buffer([
   0xc0,                      // Optional, Transitive
@@ -93,6 +93,15 @@ path.pattrs.push(new Buffer([
   0xff, 0xff, 0xff, 0x02]))  // NO_ADVERTISE
 
 gobgp.modPath(family: 'ipv4-unicast', path);
+```
+
+Or extremely easy on the latest version of gobgp,
+
+```js
+var Gobgp = require('gobgp');
+var gobgp = new Gobgp('<gobgpd address>:50051');
+
+gobgp.modPath(family: 'ipv4-flowspec', '10.0.0.0/24 community no-advertise');
 ```
 
 ## Copyright and License
