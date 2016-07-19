@@ -18,7 +18,7 @@
     "url": "https://github.com/codeout/gobgp-node/issues"
   },
   "dependencies": {
-    "grpc": "^0.13.0"
+    "grpc": "^0.15.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
