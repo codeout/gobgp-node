@@ -66,7 +66,7 @@ describe 'gobgp-node', ->
 
       expect(communities(PREFIX)).to.eql [4294967042]
 
-    it 'shows the RIB', ->  # TODO: This does actually nothing. Usechai-as-promised
+    it 'shows the RIB', ->  # TODO: This does actually nothing. Use chai-as-promised
       exec "gobgp global rib add #{PREFIX}"
 
       gobgp.getRib family: 'ipv4-unicast', (err, table) ->
@@ -96,7 +96,7 @@ describe 'gobgp-node', ->
       expect(table.length).to.equal 1
       expect(table[0].prefix).to.equal "[source:#{PREFIX}]"
 
-    it 'shows the RIB', ->  # TODO: This does actually nothing. Usechai-as-promised
+    it 'shows the RIB', ->  # TODO: This does actually nothing. Use chai-as-promised
       exec "gobgp global rib -a ipv4-flowspec add #{FLOWSPEC_PREFIX}"
 
       gobgp.getRib family: 'ipv4-flowspec', (err, table) ->
