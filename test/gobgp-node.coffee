@@ -31,7 +31,7 @@ describe 'gobgp-node', ->
     it 'originates a route', ->
       expect(global_rib()).to.be.empty
 
-      gobgp.modPath family: 'ipv4-unicast', PREFIX
+      gobgp.addPath family: 'ipv4-unicast', PREFIX
 
       table = global_rib()
       expect(table.length).to.equal 1
@@ -40,7 +40,7 @@ describe 'gobgp-node', ->
     it 'originates a route with BGP community string', ->
       expect(global_rib()).to.be.empty
 
-      gobgp.modPath family: 'ipv4-unicast', "#{PREFIX} community no-advertise"
+      gobgp.addPath family: 'ipv4-unicast', "#{PREFIX} community no-advertise"
 
       table = global_rib()
       expect(table.length).to.equal 1
@@ -58,7 +58,7 @@ describe 'gobgp-node', ->
         0x04,                      # Length
         0xff, 0xff, 0xff, 0x02])  # NO_ADVERTISE
 
-      gobgp.modPath family: 'ipv4-unicast', path
+      gobgp.addPath family: 'ipv4-unicast', path
 
       table = global_rib()
       expect(table.length).to.equal 1
@@ -81,7 +81,7 @@ describe 'gobgp-node', ->
       exec "gobgp global rib add #{PREFIX}"
       expect(global_rib()).not.to.be.empty
 
-      gobgp.modPath family: 'ipv4-unicast', withdraw: true, PREFIX
+      gobgp.deletePath family: 'ipv4-unicast', PREFIX
 
       expect(global_rib()).to.be.empty
 
@@ -90,7 +90,7 @@ describe 'gobgp-node', ->
     it 'originates a route', ->
       expect(flowspec_rib()).to.be.empty
 
-      gobgp.modPath family: 'ipv4-flowspec', FLOWSPEC_PREFIX
+      gobgp.addPath family: 'ipv4-flowspec', FLOWSPEC_PREFIX
 
       table = flowspec_rib()
       expect(table.length).to.equal 1
@@ -112,6 +112,25 @@ describe 'gobgp-node', ->
       exec "gobgp global rib -a ipv4-flowspec add #{FLOWSPEC_PREFIX}"
       expect(flowspec_rib()).not.to.be.empty
 
-      gobgp.modPath family: 'ipv4-flowspec', withdraw: true, FLOWSPEC_PREFIX
+      gobgp.deletePath family: 'ipv4-flowspec', FLOWSPEC_PREFIX
 
       expect(flowspec_rib()).to.be.empty
+
+
+  describe 'backward compatibility for modPath', ->
+    it 'originates a route', ->
+      expect(global_rib()).to.be.empty
+
+      gobgp.modPath family: 'ipv4-unicast', PREFIX
+
+      table = global_rib()
+      expect(table.length).to.equal 1
+      expect(table[0]['prefix']).to.equal PREFIX
+
+    it 'withdraws a route', ->
+      exec "gobgp global rib add #{PREFIX}"
+      expect(global_rib()).not.to.be.empty
+
+      gobgp.modPath family: 'ipv4-unicast', withdraw: true, PREFIX
+
+      expect(global_rib()).to.be.empty

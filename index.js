@@ -17,12 +17,14 @@
       if (typeof options.family === 'string') {
         options.family = this.routeFamily(options.family);
       }
-      return this.stub.getRib(options, (function(_this) {
-        return function(err, table) {
+      return this.stub.getRib({
+        table: options
+      }, (function(_this) {
+        return function(err, response) {
           if (err) {
             return callback(err);
           }
-          table.destinations.forEach(function(destination) {
+          response.table.destinations.forEach(function(destination) {
             return destination.paths = destination.paths.map(function(path) {
               var decoded;
               decoded = JSON.parse(_this.decodePath(path));
@@ -50,7 +52,7 @@
         }
         path.is_withdraw = options.withdraw;
       }
-      return this.stub.modPath({
+      return this.stub.addPath({
         path: path
       }, function(err, response) {
         if (err) {
@@ -60,6 +62,15 @@
           return callback(null, response);
         }
       });
+    };
+
+    Gobgp.prototype.addPath = function(options, path, callback) {
+      return this.modPath(options, path, callback);
+    };
+
+    Gobgp.prototype.deletePath = function(options, path, callback) {
+      options.withdraw = true;
+      return this.modPath(options, path, callback);
     };
 
     Gobgp.prototype.routeFamily = function(string) {

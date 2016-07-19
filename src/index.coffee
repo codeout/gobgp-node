@@ -11,10 +11,10 @@ class Gobgp
     if typeof(options.family) == 'string'
       options.family = @routeFamily(options.family)
 
-    @stub.getRib options, (err, table)=>
+    @stub.getRib {table: options}, (err, response)=>
       return callback(err) if err
 
-      table.destinations.forEach (destination)=>
+      response.table.destinations.forEach (destination)=>
         destination.paths = destination.paths.map (path)=>
           decoded = JSON.parse(@decodePath(path))
           path.nlri = decoded.nlri.value
@@ -22,7 +22,7 @@ class Gobgp
           delete path.pattrs
           path
 
-      callback(null, table) if callback
+      callback(null, response.table) if callback
 
 
   modPath: (options, path, callback)->
@@ -33,9 +33,18 @@ class Gobgp
       return callback("Invalid argument: path") unless path
       path.is_withdraw = options.withdraw
 
-    @stub.modPath {path: path}, (err, response)->
+    @stub.addPath {path: path}, (err, response)->
       return(callback err) if err
       callback(null, response) if callback
+
+
+  addPath: (options, path, callback)->
+    @modPath options, path, callback
+
+
+  deletePath: (options, path, callback)->
+    options.withdraw = true
+    @modPath options, path, callback
 
 
   routeFamily: (string)->
