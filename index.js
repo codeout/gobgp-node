@@ -35,7 +35,7 @@
             });
           });
           if (callback) {
-            return callback(null, table);
+            return callback(null, response.table);
           }
         };
       })(this));
