@@ -8,6 +8,7 @@ using v8::Exception;
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
 using v8::Local;
+using v8::Number;
 using v8::Object;
 using v8::String;
 using v8::Value;
@@ -97,6 +98,8 @@ void SerializePath(const FunctionCallbackInfo<Value>& args) {
 
   Local<Object> path = Object::New(isolate);
   path->Set(String::NewFromUtf8(isolate, "nlri"), node::Buffer::New(isolate, serialized->nlri.value, serialized->nlri.len).ToLocalChecked());
+
+  path->Set(String::NewFromUtf8(isolate, "family"), Number::New(isolate, args[0]->NumberValue()));
 
   Local<Array> pattrs = Array::New(isolate);
   for (int i = 0; i < serialized->path_attributes_len; i++) {
