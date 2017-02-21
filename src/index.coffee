@@ -7,12 +7,20 @@ class Gobgp
     @stub = new protoDescriptor.GobgpApi(server, grpc.credentials.createInsecure())
 
 
+  defaultCallback: (err)->
+    return console.error(err)
+
+
   getRib: (options, callback)->
     if typeof(options.family) == 'string'
       options.family = @routeFamily(options.family)
 
     @stub.getRib {table: options}, (err, response)=>
-      return callback(err) if err
+      if err
+        if callback
+          return callback(err)
+        else
+          return @defaultCallback(err)
 
       response.table.destinations.forEach (destination)=>
         destination.paths = destination.paths.map (path)=>
@@ -33,8 +41,13 @@ class Gobgp
       return callback("Invalid argument: path") unless path
       path.is_withdraw = options.withdraw
 
-    @stub.addPath {path: path}, (err, response)->
-      return(callback err) if err
+    @stub.addPath {path: path}, (err, response)=>
+      if err
+        if callback
+          return callback(err)
+        else
+          return @defaultCallback(err)
+
       callback(null, response) if callback
 
 
