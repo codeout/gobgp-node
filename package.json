@@ -1,7 +1,7 @@
 {
   "name": "gobgp",
   "description": "gobgp library - NodeJS client for gobgpd",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Shintaro Kojima <goodies@codeout.net>",
   "license": "MIT",
   "keywords": [

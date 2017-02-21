@@ -18,7 +18,7 @@ gobgp-node is tested on Debian Linux and OSX.
   * Requires an environment variable ```$GOPATH``` to be configured
 * [grpc](https://github.com/grpc/grpc/blob/master/INSTALL.md)
 * [gobgp](https://github.com/osrg/gobgp)
-  * v1.7 or later
+  * v1.15 or later
 
 ## Installation
 
