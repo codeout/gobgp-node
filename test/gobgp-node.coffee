@@ -5,22 +5,30 @@ expect = require('chai').expect
 exec   = require('child_process').execSync
 
 describe 'gobgp-node', ->
-  global_rib = ->
-    JSON.parse(exec('gobgp -j global rib'))
+  global_rib = (prefix) ->
+    table = JSON.parse(exec('gobgp -j global rib'))
+    if prefix
+      table[prefix]
+    else
+      table
 
-  flowspec_rib = ->
-    JSON.parse(exec('gobgp -j global rib -a ipv4-flowspec'))
+  flowspec_rib = (prefix) ->
+    table = JSON.parse(exec('gobgp -j global rib -a ipv4-flowspec'))
+    if prefix
+      table[prefix]
+    else
+      table
 
   communities = (prefix) ->
-    table = global_rib()
-    paths = table.filter (i) -> i['prefix']==prefix
+    paths = global_rib(prefix)
     return if paths.empty?
 
-    comms = paths[0]['paths'][0]['attrs'].filter (i) -> i['type']==8
+    comms = paths[0]['attrs'].filter (i) -> i['type']==8
     return comms[0]['communities']
 
   PREFIX = '10.0.0.0/24'
   FLOWSPEC_PREFIX = "match source #{PREFIX} then rate-limit 10000"
+  FLOWSPEC_JSON_PREFIX = "[source:#{PREFIX}]"
 
   beforeEach ->
     exec "gobgp global rib del #{PREFIX}"
@@ -33,18 +41,16 @@ describe 'gobgp-node', ->
 
       gobgp.addPath family: 'ipv4-unicast', PREFIX
 
-      table = global_rib()
-      expect(table.length).to.equal 1
-      expect(table[0]['prefix']).to.equal PREFIX
+      prefixes = global_rib(PREFIX)
+      expect(prefixes.length).to.equal 1
 
     it 'originates a route with BGP community string', ->
       expect(global_rib()).to.be.empty
 
       gobgp.addPath family: 'ipv4-unicast', "#{PREFIX} community no-advertise"
 
-      table = global_rib()
-      expect(table.length).to.equal 1
-      expect(table[0]['prefix']).to.equal PREFIX
+      prefixes = global_rib(PREFIX)
+      expect(prefixes.length).to.equal 1
 
       expect(communities(PREFIX)).to.eql [4294967042]
 
@@ -60,9 +66,8 @@ describe 'gobgp-node', ->
 
       gobgp.addPath family: 'ipv4-unicast', path
 
-      table = global_rib()
-      expect(table.length).to.equal 1
-      expect(table[0]['prefix']).to.equal PREFIX
+      prefixes = global_rib(PREFIX)
+      expect(prefixes.length).to.equal 1
 
       expect(communities(PREFIX)).to.eql [4294967042]
 
@@ -92,9 +97,8 @@ describe 'gobgp-node', ->
 
       gobgp.addPath family: 'ipv4-flowspec', FLOWSPEC_PREFIX
 
-      table = flowspec_rib()
-      expect(table.length).to.equal 1
-      expect(table[0].prefix).to.equal "[source:#{PREFIX}]"
+      prefixes = flowspec_rib(FLOWSPEC_JSON_PREFIX)
+      expect(prefixes.length).to.equal 1
 
     it 'shows the RIB', ->  # TODO: This does actually nothing. Use chai-as-promised
       exec "gobgp global rib -a ipv4-flowspec add #{FLOWSPEC_PREFIX}"
@@ -123,9 +127,8 @@ describe 'gobgp-node', ->
 
       gobgp.modPath family: 'ipv4-unicast', PREFIX
 
-      table = global_rib()
-      expect(table.length).to.equal 1
-      expect(table[0]['prefix']).to.equal PREFIX
+      prefixes = global_rib(PREFIX)
+      expect(prefixes.length).to.equal 1
 
     it 'withdraws a route', ->
       exec "gobgp global rib add #{PREFIX}"
