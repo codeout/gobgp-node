@@ -106,4 +106,4 @@ gobgp.addPath({family: 'ipv4-unicast'}, '10.0.0.0/24 community no-advertise');
 
 ## Copyright and License
 
-Copyright (c) 2016 Shintaro Kojima. Code released under the [MIT license](LICENSE).
+Copyright (c) 2017 Shintaro Kojima. Code released under the [MIT license](LICENSE).
