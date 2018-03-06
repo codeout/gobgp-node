@@ -54,7 +54,7 @@ Show routes in gobgpd:
 var Gobgp = require('gobgp');
 var gobgp = new Gobgp('<gobgpd address>:50051');
 
-gobgp.getRib({family: 'ipv4-unicast'}, function(err, table) {
+gobgp.getRib({family: 'ipv4-unicast'}).then(function(table) {
   console.log(table);
 });
 ```
@@ -74,7 +74,7 @@ Show flowspec routes in gobgpd:
 var Gobgp = require('gobgp');
 var gobgp = new Gobgp('<gobgpd address>:50051');
 
-gobgp.getRib({family: 'ipv4-flowspec'}, function(err, table) {
+gobgp.getRib({family: 'ipv4-flowspec'}).then(function(table) {
   console.log(table);
 });
 ```
