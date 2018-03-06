@@ -22,7 +22,7 @@ describe('gobgp-node', () => {
     }
   };
 
-  const communities = (prfix) => {
+  const communities = (prefix) => {
     const paths = global_rib(prefix);
     if (!paths) {
       return;
@@ -34,7 +34,7 @@ describe('gobgp-node', () => {
 
   const PREFIX = '10.0.0.0/24';
   const FLOWSPEC_PREFIX = `match source ${PREFIX} then rate-limit 10000`;
-  const FLOWSPEC_JSON_PREFIX = `[source:${PREFIX}]`;
+  const FLOWSPEC_JSON_PREFIX = `[source: ${PREFIX}]`;
 
   beforeEach(() => {
     exec(`gobgp global rib del ${PREFIX}`);
@@ -43,27 +43,29 @@ describe('gobgp-node', () => {
 
 
   describe('family ipv4-unicast', () => {
-    it('originates a route', () => {
+    it('originates a route', (done) => {
       expect(global_rib()).to.be.empty;
 
-      gobgp.addPath({family: 'ipv4-unicast'}, PREFIX, () => {
+      gobgp.addPath({family: 'ipv4-unicast'}, PREFIX).then(() => {
         const prefixes = global_rib(PREFIX);
         expect(prefixes.length).to.equal(1);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('originates a route with BGP community string', () => {
+    it('originates a route with BGP community string', (done) => {
       expect(global_rib()).to.be.empty;
 
-      gobgp.addPath({family: 'ipv4-unicast'}, `${PREFIX} community no-advertise`, () => {
+      gobgp.addPath({family: 'ipv4-unicast'}, `${PREFIX} community no-advertise`).then(() => {
         const prefixes = global_rib(PREFIX);
         expect(prefixes.length).to.equal(1);
 
         expect(communities(PREFIX)).to.eql([4294967042]);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('originates a route with BGP community byte array', () => {
+    it('originates a route with BGP community byte array', (done) => {
       expect(global_rib()).to.be.empty;
 
       const path = gobgp.serializePath('ipv4-unicast', PREFIX);
@@ -74,89 +76,97 @@ describe('gobgp-node', () => {
         0xff, 0xff, 0xff, 0x02 // NO_ADVERTISE
       ]));
 
-      gobgp.addPath({family: 'ipv4-unicast'}, path, () => {
+      gobgp.addPath({family: 'ipv4-unicast'}, path).then(() => {
         const prefixes = global_rib(PREFIX);
         expect(prefixes.length).to.equal(1);
 
         expect(communities(PREFIX)).to.eql([4294967042]);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('shows the RIB', () => { // TODO: This does actually nothing. Use chai-as-promised
+    it('shows the RIB', (done) => {
       exec(`gobgp global rib add ${PREFIX}`);
 
-      gobgp.getRib({family: 'ipv4-unicast'}, (err, table) => {
+      gobgp.getRib({family: 'ipv4-unicast'}).then((table) => {
         expect(table['type']).to.equal('GLOBAL');
         expect(table['family']).to.equal(65537);
         expect(table['destinations'].length).to.equal(1);
 
         const path = table['destinations'][0];
         expect(path['prefix']).to.equal(PREFIX);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('withdraws a route', () => {
+    it('withdraws a route', (done) => {
       exec(`gobgp global rib add ${PREFIX}`);
       expect(global_rib()).not.to.be.empty;
 
-      gobgp.deletePath({family: 'ipv4-unicast'}, PREFIX, () => {
+      gobgp.deletePath({family: 'ipv4-unicast'}, PREFIX).then(() => {
         expect(global_rib()).to.be.empty;
-      });
+        done();
+      }).catch(done);
     });
   });
 
 
   describe('family ipv4-flowspec', () => {
-    it('originates a route', () => {
+    it('originates a route', (done) => {
       expect(flowspec_rib()).to.be.empty;
 
-      gobgp.addPath({family: 'ipv4-flowspec'}, FLOWSPEC_PREFIX, () => {
+      gobgp.addPath({family: 'ipv4-flowspec'}, FLOWSPEC_PREFIX).then(() => {
         const prefixes = flowspec_rib(FLOWSPEC_JSON_PREFIX);
         expect(prefixes.length).to.equal(1);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('shows the RIB', () => { // TODO: This does actually nothing. Use chai-as-promised
+    it('shows the RIB', (done) => {
       exec(`gobgp global rib -a ipv4-flowspec add ${FLOWSPEC_PREFIX}`);
 
-      gobgp.getRib({family: 'ipv4-flowspec'}, (err, table) => {
+      gobgp.getRib({family: 'ipv4-flowspec'}).then((table) => {
         expect(table.type).to.equal('GLOBAL');
         expect(table.family).to.equal(65669);
         expect(table.destinations.length).to.equal(1);
 
         const path = table.destinations[0];
-        expect(path.prefix).to.equal(`[source:${PREFIX}]`);
+        expect(path.prefix).to.equal(`[source: ${PREFIX}]`);
         expect(path.paths[0].attrs[2].value[0].rate).to.equal(10000);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('withdraws a route', () => {
+    it('withdraws a route', (done) => {
       exec(`gobgp global rib -a ipv4-flowspec add ${FLOWSPEC_PREFIX}`);
       expect(flowspec_rib()).not.to.be.empty;
 
-      gobgp.deletePath({family: 'ipv4-flowspec'}, FLOWSPEC_PREFIX, () => {
+      gobgp.deletePath({family: 'ipv4-flowspec'}, FLOWSPEC_PREFIX).then(() => {
         expect(flowspec_rib()).to.be.empty;
-      });
+        done();
+      }).catch(done);
     });
   });
 
   describe('backward compatibility for modPath', () => {
-    it('originates a route', () => {
+    it('originates a route', (done) => {
       expect(global_rib()).to.be.empty;
 
-      gobgp.modPath({family: 'ipv4-unicast'}, PREFIX, () => {
+      gobgp.modPath({family: 'ipv4-unicast'}, PREFIX).then(() => {
         const prefixes = global_rib(PREFIX);
         expect(prefixes.length).to.equal(1);
-      });
+        done();
+      }).catch(done);
     });
 
-    it('withdraws a route', () => {
+    it('withdraws a route', (done) => {
       exec(`gobgp global rib add ${PREFIX}`);
       expect(global_rib()).not.to.be.empty;
 
-      gobgp.modPath({family: 'ipv4-unicast', withdraw: true}, PREFIX, () => {
+      gobgp.modPath({family: 'ipv4-unicast', withdraw: true}, PREFIX).then(() => {
         expect(global_rib()).to.be.empty;
-      });
+        done();
+      }).catch(done);
     });
   });
 });

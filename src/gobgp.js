@@ -7,64 +7,57 @@ class Gobgp {
     this.stub = new protoDescriptor.GobgpApi(server, grpc.credentials.createInsecure());
   }
 
-  handleError(err, callback) {
-    if (callback) {
-      return callback(err);
-    } else {
-      return console.error(err);
-    }
-  }
-
-  getRib(options, callback) {
+  getRib(options) {
     if (typeof (options.family) == 'string') {
       options.family = this.routeFamily(options.family);
     }
 
-    this.stub.getRib({table: options}, (err, response) => {
-      if (err) {
-        return this.handleError(err, callback);
-      }
+    return new Promise((resolve, reject) => {
+      this.stub.getRib({table: options}, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          response.table.destinations.forEach((destination) => {
+            destination.paths = destination.paths.map((path) => {
+              const decoded = JSON.parse(this.decodePath(path));
 
-      response.table.destinations.forEach((destination) => {
-        destination.paths = destination.paths.map((path) => {
-          const decoded = JSON.parse(this.decodePath(path));
+              path.nlri = decoded.nlri.value;
+              path.attrs = decoded.attrs;
+              delete path.pattrs;
 
-          path.nlri = decoded.nlri.value;
-          path.attrs = decoded.attrs;
-          delete path.pattrs;
+              return path;
+            });
+          });
 
-          return path;
-        });
+          resolve(response.table);
+        }
       });
-
-      if (callback) {
-        return callback(null, response.table);
-      }
     });
   }
 
   modPath(options, path, callback) {
-    if (!path) {
-      this.handleError('Missing argument: path', callback);
-    }
-    const originalPath = path;
-
-    if (typeof (path) == 'string') {
-      path = this.serializePath(options.family, path);
-
+    return new Promise((resolve, reject) => {
       if (!path) {
-        return this.handleError(`Invalid argument: path "${originalPath}"`, callback);
+        reject('Missing argument: path');
       }
-      path.is_withdraw = options.withdraw;
-    }
+      const originalPath = path;
 
-    this.stub.addPath({path: path}, (err, response) => {
-      if (err) {
-        return this.handleError(err, callback);
+      if (typeof (path) == 'string') {
+        path = this.serializePath(options.family, path);
+
+        if (!path) {
+          reject(`Invalid argument: path "${originalPath}"`);
+        }
+        path.is_withdraw = options.withdraw;
       }
-      if (callback) {
-        return callback(null, response);
-      }
+
+      this.stub.addPath({path: path}, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
     });
   }
 

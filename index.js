@@ -24,43 +24,34 @@ var Gobgp = function () {
   }
 
   _createClass(Gobgp, [{
-    key: 'handleError',
-    value: function handleError(err, callback) {
-      if (callback) {
-        return callback(err);
-      } else {
-        return console.error(err);
-      }
-    }
-  }, {
     key: 'getRib',
-    value: function getRib(options, callback) {
+    value: function getRib(options) {
       var _this = this;
 
       if (typeof options.family == 'string') {
         options.family = this.routeFamily(options.family);
       }
 
-      this.stub.getRib({ table: options }, function (err, response) {
-        if (err) {
-          return _this.handleError(err, callback);
-        }
+      return new Promise(function (resolve, reject) {
+        _this.stub.getRib({ table: options }, function (err, response) {
+          if (err) {
+            reject(err);
+          } else {
+            response.table.destinations.forEach(function (destination) {
+              destination.paths = destination.paths.map(function (path) {
+                var decoded = JSON.parse(_this.decodePath(path));
 
-        response.table.destinations.forEach(function (destination) {
-          destination.paths = destination.paths.map(function (path) {
-            var decoded = JSON.parse(_this.decodePath(path));
+                path.nlri = decoded.nlri.value;
+                path.attrs = decoded.attrs;
+                delete path.pattrs;
 
-            path.nlri = decoded.nlri.value;
-            path.attrs = decoded.attrs;
-            delete path.pattrs;
+                return path;
+              });
+            });
 
-            return path;
-          });
+            resolve(response.table);
+          }
         });
-
-        if (callback) {
-          return callback(null, response.table);
-        }
       });
     }
   }, {
@@ -68,27 +59,28 @@ var Gobgp = function () {
     value: function modPath(options, path, callback) {
       var _this2 = this;
 
-      if (!path) {
-        this.handleError('Missing argument: path', callback);
-      }
-      var originalPath = path;
-
-      if (typeof path == 'string') {
-        path = this.serializePath(options.family, path);
-
+      return new Promise(function (resolve, reject) {
         if (!path) {
-          return this.handleError('Invalid argument: path "' + originalPath + '"', callback);
+          reject('Missing argument: path');
         }
-        path.is_withdraw = options.withdraw;
-      }
+        var originalPath = path;
 
-      this.stub.addPath({ path: path }, function (err, response) {
-        if (err) {
-          return _this2.handleError(err, callback);
+        if (typeof path == 'string') {
+          path = _this2.serializePath(options.family, path);
+
+          if (!path) {
+            reject('Invalid argument: path "' + originalPath + '"');
+          }
+          path.is_withdraw = options.withdraw;
         }
-        if (callback) {
-          return callback(null, response);
-        }
+
+        _this2.stub.addPath({ path: path }, function (err, response) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response);
+          }
+        });
       });
     }
   }, {
