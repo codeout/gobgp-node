@@ -33,8 +33,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "babel src/gobgp.js -o index.js",
     "lint": "eslint src test",
+    "build": "babel src/gobgp.js -o index.js",
+    "watch": "babel src/gobgp.js -wo index.js",
     "rebuild": "node-gyp rebuild && babel src/gobgp.js -o index.js",
     "test": "mocha --compilers js:babel-core/register"
   },
