@@ -55,9 +55,31 @@ var Gobgp = function () {
       });
     }
   }, {
-    key: 'modPath',
-    value: function modPath(options, path, callback) {
+    key: 'getRibInfo',
+    value: function getRibInfo(options) {
       var _this2 = this;
+
+      if (typeof options.family == 'string') {
+        options.family = this.routeFamily(options.family);
+      }
+
+      return new Promise(function (resolve, reject) {
+        _this2.stub.getRibInfo({ info: options }, function (err, response) {
+          if (err) {
+            reject(err);
+          } else {
+            ['num_destination', 'num_path', 'num_accepted'].forEach(function (i) {
+              response.info[i] = parseInt(response.info[i]);
+            });
+            resolve(response.info);
+          }
+        });
+      });
+    }
+  }, {
+    key: 'modPath',
+    value: function modPath(options, path) {
+      var _this3 = this;
 
       return new Promise(function (resolve, reject) {
         if (!path) {
@@ -66,7 +88,7 @@ var Gobgp = function () {
         var originalPath = path;
 
         if (typeof path == 'string') {
-          path = _this2.serializePath(options.family, path);
+          path = _this3.serializePath(options.family, path);
 
           if (!path) {
             reject('Invalid argument: path "' + originalPath + '"');
@@ -74,7 +96,7 @@ var Gobgp = function () {
           path.is_withdraw = options.withdraw;
         }
 
-        _this2.stub.addPath({ path: path }, function (err, response) {
+        _this3.stub.addPath({ path: path }, function (err, response) {
           if (err) {
             reject(err);
           } else {
@@ -85,14 +107,14 @@ var Gobgp = function () {
     }
   }, {
     key: 'addPath',
-    value: function addPath(options, path, callback) {
-      return this.modPath(options, path, callback);
+    value: function addPath(options, path) {
+      return this.modPath(options, path);
     }
   }, {
     key: 'deletePath',
-    value: function deletePath(options, path, callback) {
+    value: function deletePath(options, path) {
       options.withdraw = true;
-      return this.modPath(options, path, callback);
+      return this.modPath(options, path);
     }
   }, {
     key: 'routeFamily',

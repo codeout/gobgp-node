@@ -35,7 +35,26 @@ class Gobgp {
     });
   }
 
-  modPath(options, path, callback) {
+  getRibInfo(options) {
+    if (typeof (options.family) == 'string') {
+      options.family = this.routeFamily(options.family);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.stub.getRibInfo({info: options}, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          ['num_destination', 'num_path', 'num_accepted'].forEach((i) => {
+            response.info[i] = parseInt(response.info[i]);
+          });
+          resolve(response.info);
+        }
+      });
+    });
+  }
+
+  modPath(options, path) {
     return new Promise((resolve, reject) => {
       if (!path) {
         reject('Missing argument: path');
@@ -61,13 +80,13 @@ class Gobgp {
     });
   }
 
-  addPath(options, path, callback) {
-    return this.modPath(options, path, callback);
+  addPath(options, path) {
+    return this.modPath(options, path);
   }
 
-  deletePath(options, path, callback) {
+  deletePath(options, path) {
     options.withdraw = true;
-    return this.modPath(options, path, callback);
+    return this.modPath(options, path);
   }
 
   routeFamily(string) {
