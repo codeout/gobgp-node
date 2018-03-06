@@ -2,7 +2,11 @@
   "name": "gobgp",
   "description": "gobgp library - NodeJS client for gobgpd",
   "version": "0.1.5",
-  "author": "Shintaro Kojima <goodies@codeout.net>",
+  "author": {
+    "name": "Shintaro Kojima",
+    "email": "goodies@codeout.net",
+    "url": "http://github.com/codeout"
+  },
   "license": "MIT",
   "keywords": [
     "gobgp",
@@ -21,14 +25,23 @@
     "grpc": "^1.9.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "chai": "^4.1.2",
     "coffee-script": "^1.12.7",
+    "eslint": "^4.18.2",
     "mocha": "^3.5.3"
   },
   "main": "index.js",
   "scripts": {
-    "build": "coffee -o . -c src/index.coffee",
-    "rebuild": "node-gyp rebuild && coffee -o . -c src/index.coffee",
+    "build": "babel src/gobgp.js -o index.js",
+    "lint": "eslint src",
+    "rebuild": "node-gyp rebuild && babel src/gobgp.js -o index.js",
     "test": "mocha --compilers coffee:coffee-script/register"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
   }
 }
