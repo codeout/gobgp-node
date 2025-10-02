@@ -1,7 +1,5 @@
 # gobgp-node
 
-[![Code Climate](https://codeclimate.com/github/codeout/gobgp-node.png)](https://codeclimate.com/github/codeout/gobgp-node)
-
 gobgp library - NodeJS client for gobgpd
 
 This is a young project which allows you to manage gobgpd remotely.
